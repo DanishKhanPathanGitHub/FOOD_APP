@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{user.username}}
+<p>welcome {{user.username}}</p>
+<p>this is {{user.role}} dashboard</p>
+{% if messages %}
+{% for message in messages  %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+</button>
+{{message}}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock content %}
