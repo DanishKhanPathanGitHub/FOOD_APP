@@ -137,3 +137,17 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+'''
+EMAIL_HOST = config('EMAIL_HOST'),
+EMAIL_PORT = config('EMAIL_PORT', cast=int),
+EMAIL_USE_TLS = True  # Whether to use TLS (True/False)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER'),
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+'''
+EMAIL_HOST='smtp.gmail.com' 
+EMAIL_PORT=587  
+EMAIL_HOST_USER='dkz20041506@gmail.com' 
+EMAIL_HOST_PASSWORD='lfjxmfxjxdapqpax'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'FoodOnline Markeplace <dkz20041506@gmail.com>'
