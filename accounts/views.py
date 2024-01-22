@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import *
 from .forms import *
+from vendor.models import Vendor
 from vendor.forms import vendorForm
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -42,11 +43,12 @@ def registerUser(request):
                 user.save()
 
                 #send verification email
-                mail_subject = 'Reset your password'
+                mail_subject = 'Activate your account'
                 email_template = 'emails/account_verification_email.html'
                 send_verification_email(request, user, mail_subject, email_template)
 
                 messages.success(request, "Your account has been registered succesfully")
+                messages.success(request, "Account activation link sent to your email address")
                 return redirect('registerUser')
             else:
                 print('not valid')
@@ -84,11 +86,12 @@ def registerVendor(request):
                 #print('vendor saved')
 
                 #send verification email
-                mail_subject = 'Reset your password'
+                mail_subject = 'Activate your account'
                 email_template = 'emails/account_verification_email.html'
                 send_verification_email(request, user, mail_subject, email_template)
-
                 messages.success(request, "Your account has been registered succesfully, Wait for approval")
+                messages.success(request, "Account activation link sent to your email address! NOTE: you need to activate your account for approval")
+                
                 return redirect('registerVendor')
         context = {
             "user_form":user_form,
@@ -139,7 +142,10 @@ def myAccount(request):
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    context = {}
+    vendor = Vendor.objects.get(user=request.user)
+    context = {
+        "vendor":vendor,
+    }
     return render(request, 'accounts/vendorDashboard.html', context)
 
 @login_required(login_url='login') 
@@ -161,7 +167,7 @@ def forgot_password(request):
             messages.success(request, 'Password reset link sent to your email account')
             return redirect('login')
         else:
-            messages.error(request, 'Account doe not exist!')
+            messages.error(request, 'Account does not exist!')
             redirect('forgot_password')
     return render(request, 'accounts/forgot_password.html')
 
