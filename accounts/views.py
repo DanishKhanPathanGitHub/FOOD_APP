@@ -130,10 +130,12 @@ def logout(request):
 def myAccount(request):
     redirecturl = '/'
     user = request.user
+    print(user.role)
     if user.role == 1:
         redirecturl = 'custDashboard'
     elif user.role == 2:
         redirecturl = 'vendorDashboard'
+        print('redirect url is :', redirecturl )
     elif user.role and user.is_active == True:
         redirecturl = 'admin/'
     
@@ -142,17 +144,12 @@ def myAccount(request):
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    vendor = Vendor.objects.get(user=request.user)
-    context = {
-        "vendor":vendor,
-    }
-    return render(request, 'accounts/vendorDashboard.html', context)
+    return render(request, 'accounts/vendorDashboard.html')
 
 @login_required(login_url='login') 
 @user_passes_test(check_role_customer)   
 def custDashboard(request):
-    context = {}
-    return render(request, 'accounts/custDashboard.html', context)
+    return render(request, 'accounts/custDashboard.html')
 
 def forgot_password(request):
     if request.POST:
