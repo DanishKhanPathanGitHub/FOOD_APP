@@ -25,8 +25,8 @@
                                     <hr>
                                     <h6>menu categories</h6>
                                     <div class="text-right">
-                                        <a href=# class="btn btn-success m-1">Add food</a>
-                                        <a href=# class="btn btn-success m-1">Add category</a>
+                                        <a href="{% url "food_add" %}" class="btn btn-success m-1">Add food</a>
+                                        <a href="{% url "category_add" %}" class="btn btn-success m-1">Add category</a>
                                     </div>
 									<table class="table table-hover table-borderless">
                                         <tbody>
@@ -38,12 +38,23 @@
                                                 <small>{{category.description}}</small>
                                             </td>
                                             <td>
-                                                <i class="fa fa-edit"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <i class="fa fa-trash text-danger"></i>
+                                                <a href="{% url "category_edit" category.id %}" style="color:unset"><i class="fa fa-edit"></i></a>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <a href="{% url "category_delete" category.id %}" style="color:red" onclick="return confirm('Confirm delete?')"><i class="fa fa-trash text-danger"></i></a>
                                             </td>
                                           </tr>
                                         {% endfor %}
                                         </tbody>
+                                        {% if messages %}
+                                        {% for message in messages  %}
+                                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{message}}
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
                                       </table>
 									<!-- My Restaurants Form End -->
                             
@@ -56,14 +67,4 @@
 </div>
 <!-- Main Section End -->
 
-{% if messages %}
-{% for message in messages  %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-</button>
-{{message}}
-</div>
-{% endfor %}
-{% endif %}
 {% endblock content %}
