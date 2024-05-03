@@ -47,6 +47,13 @@
                                                 <small>{{food.description}}</small>
                                             </td>
                                             <td>
+                                                {% if food.is_available %}
+                                                <span class="badge badge-success">Available</span>
+                                                {% else %}
+                                                <span class="badge badge-dark">not available</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
                                                 <a href="{% url "food_edit" food.id %}" style="color:unset"><i class="fa fa-edit"></i></a>
                                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                 <a href="{% url "food_delete" food.id %}" onclick="return confirm('Confirm delete?')"><i class="fa fa-trash text-danger"></i></a>

@@ -13,7 +13,6 @@ from django.template.defaultfilters import slugify
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
 def profile(request):
-
     user_profile = get_object_or_404(userProfile, user=request.user)
     vendor = get_object_or_404(Vendor, user=request.user)
     if request.POST:
@@ -130,8 +129,10 @@ def category_delete(request, pk=None):
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
 def food_add(request):
+    vendor = Vendor.objects.get(user=request.user)
+    food_item_form = foodItemForm(vendor_id=vendor.id)
     if request.POST:
-        food_item_form = foodItemForm(request.POST, request.FILES)
+        food_item_form = foodItemForm(request.POST, request.FILES, vendor_id=vendor.id)
         if food_item_form.is_valid():
             food_name = food_item_form.cleaned_data['food_name']
             food_item = food_item_form.save(commit=False)
@@ -143,8 +144,6 @@ def food_add(request):
         else:
             print("form is not valid")
             print(food_item_form.errors)
-    else: 
-        food_item_form = foodItemForm()
         
     context = {
         "food_item_form":food_item_form,
@@ -155,15 +154,17 @@ def food_add(request):
 @user_passes_test(check_role_vendor)
 def food_edit(request, pk=None):
     food = get_object_or_404(foodItem, pk=pk)
+    food_item_form = foodItemForm(instance=food)
+    vendor = Vendor.objects.get(user=request.user)
     if request.POST:
-        food_item_form = foodItemForm(request.POST, request.FILES, instance=food)
+        food_item_form = foodItemForm(request.POST, request.FILES, instance=food, vendor_id=vendor.id)
         if food_item_form.is_valid():
             food_item_name = food_item_form.cleaned_data['food_name']
             food_item = food_item_form.save(commit=False)
             food_item.slug = slugify(food_item_name)
             food_item.vendor = Vendor.objects.get(user=request.user)
             food_item_form.save()
-            messages.success(request, "category updated succesfully")
+            messages.success(request, "food updated succesfully")
             return  redirect('foodItem_by_category', food_item.category.id)
         else:
             print("form is not valid")
@@ -171,7 +172,7 @@ def food_edit(request, pk=None):
             print(food_item_form.errors)
             
     else: 
-        food_item_form = foodItemForm(instance=food)
+        food_item_form = foodItemForm(instance=food, vendor_id=vendor.id)
         
     context = {
         "food":food,

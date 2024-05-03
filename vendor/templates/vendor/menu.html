@@ -30,6 +30,7 @@
                                     </div>
 									<table class="table table-hover table-borderless">
                                         <tbody>
+                                        {% if categories %}
                                         {% for category in categories %}
                                           <tr>
                                             <th class='text-left'scope="row">{{forloop.counter}}</th>
@@ -40,10 +41,13 @@
                                             <td>
                                                 <a href="{% url "category_edit" category.id %}" style="color:unset"><i class="fa fa-edit"></i></a>
                                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                <a href="{% url "category_delete" category.id %}" style="color:red" onclick="return confirm('Confirm delete?')"><i class="fa fa-trash text-danger"></i></a>
+                                                <a href="{% url "category_delete" category.id %}" style="color:red" onclick="return confirm('Confirm delete category?')"><i class="fa fa-trash text-danger"></i></a>
                                             </td>
                                           </tr>
                                         {% endfor %}
+                                        {% else %}
+                                        No categories
+                                        {% endif %}
                                         </tbody>
                                         {% if messages %}
                                         {% for message in messages  %}
