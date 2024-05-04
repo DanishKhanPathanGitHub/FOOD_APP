@@ -3,6 +3,7 @@ from django.http import *
 from .forms import *
 from vendor.models import Vendor
 from vendor.forms import vendorForm
+from django.template.defaultfilters import slugify
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
@@ -79,6 +80,8 @@ def registerVendor(request):
                 user.save()
                 vendor = vendor_form.save(commit=False)
                 vendor.user = user
+                vendor_name = vendor_form.cleaned_data['vendor_name']
+                vendor.slug = slugify(vendor_name)+'-'+str(((user.id*24)/20.5)+71)[:10]
                 #print("vendor user assign")
                 vendor.vendor_profile = userProfile.objects.get(user=user)
                 #print('vendor user profile assign')

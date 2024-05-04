@@ -19,7 +19,6 @@ def profile(request):
         print('request is post')
         user_profile_form = userProfileForm(request.POST, request.FILES, instance=user_profile)
         vendor_form = vendorForm(request.POST, request.FILES, instance=vendor)
-        print(user_profile_form.fields)
         if user_profile_form.is_valid() and vendor_form.is_valid():
             user_profile_form.save()
             vendor_form.save()
