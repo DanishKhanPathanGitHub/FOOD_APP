@@ -111,9 +111,9 @@
 									<li class="has-border">
 										<figure>
 											{% if vendor.vendor_profile.profile_pic %}
-											<a href="#"><img src="{{vendor.vendor_profile.profile_pic.url}}" class="attachment-full size-full wp-post-image" width="220px" height="125px" alt=""></a>
+											<a href="{% url "vendor_detail" vendor.slug %}"><img src="{{vendor.vendor_profile.profile_pic.url}}" class="attachment-full size-full wp-post-image" width="220px" height="125px" alt=""></a>
 											{% else %}
-											<a href="#"><img src="{% static "images/default-profile.png" %}" class="attachment-full size-full wp-post-image" width="220px" height="125px" alt=""></a>
+											<a href="{% url "vendor_detail" vendor.slug %}"><img src="{% static "images/default-profile.png" %}" class="attachment-full size-full wp-post-image" width="220px" height="125px" alt=""></a>
 											{% endif %}
 										</figure>
 									</li>
@@ -144,10 +144,10 @@
 											<div class="img-holder">
 												<figure>
 													{% if vendor.vendor_profile.profile_pic %}
-													<a href="#"><img src="{{vendor.vendor_profile.profile_pic.url}}" class="img-thumb wp-post-image" alt="">
+													<a href="{% url "vendor_detail" vendor.slug %}"><img src="{{vendor.vendor_profile.profile_pic.url}}" class="img-thumb wp-post-image" alt="">
 													</a>
 													{% else %}
-													<a href="#"><img src="{% static "images/default-profile.png" %}" class="img-thumb wp-post-image" alt="">
+													<a href="{% url "vendor_detail" vendor.slug %}"><img src="{% static "images/default-profile.png" %}" class="img-thumb wp-post-image" alt="">
 													</a>
 													{% endif %}
 												</figure>
@@ -158,7 +158,7 @@
 											<div class="text-holder">
 												<div class="post-title">
 													<h5>
-														<a href="listing-detail.html">{{vendor.vendor_name}}</a>
+														<a href="{% url "vendor_detail" vendor.slug %}">{{vendor.vendor_name}}</a>
 													</h5>
 												</div>
 												{% if vendor.vendor_profile.pincode %}
