@@ -153,7 +153,6 @@ def food_add(request):
 @user_passes_test(check_role_vendor)
 def food_edit(request, pk=None):
     food = get_object_or_404(foodItem, pk=pk)
-    food_item_form = foodItemForm(instance=food)
     vendor = Vendor.objects.get(user=request.user)
     if request.POST:
         food_item_form = foodItemForm(request.POST, request.FILES, instance=food, vendor_id=vendor.id)

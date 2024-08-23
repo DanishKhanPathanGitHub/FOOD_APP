@@ -81,7 +81,7 @@ class userProfile(models.Model):
     pincode = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    lattitued = models.CharField(max_length=20, blank=True, null=True)
+    latitude = models.CharField(max_length=20, blank=True, null=True)
     longitude = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):

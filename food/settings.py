@@ -70,6 +70,7 @@ TEMPLATES = [
                 'accounts.contextProcessor.get_vednor',
                 'marketplace.contextProcessor.get_cart_counter',
                 'marketplace.contextProcessor.get_cart_total',
+                'accounts.contextProcessor.get_google_api'
             ],
         },
     },
@@ -160,3 +161,4 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'FoodOnline Markeplace <dkz20041506@gmail.com>'
 
 '''
+GOOGLE_API_KEY = 'AIzaSyAp6PaKcd9784d90uAeLBiQz75oKymfrrI'

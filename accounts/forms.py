@@ -12,6 +12,8 @@ class userForm(forms.ModelForm):
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
+        if not password or not confirm_password:
+            raise forms.ValidationError("Password must not be empty")
         if password and confirm_password and password != confirm_password:
             raise forms.ValidationError("Passwords do not match")
 
@@ -24,7 +26,7 @@ class userProfileForm(forms.ModelForm):
     
     class Meta:
         model = userProfile
-        fields = ["profile_pic", "cover_pic", "address", "country", "state", "city", "pincode","lattitued", "longitude",]
+        fields = ["profile_pic", "cover_pic", "address", "country", "state", "city", "pincode","latitude", "longitude",]
     #over-ridding method for making field readonly
     def __init__(self, *args, **kwargs):
         super(userProfileForm, self).__init__(*args, **kwargs)
