@@ -24,5 +24,4 @@ def get_cart_total(request):
         for item in cart_items:
             subtotal+=(item.fooditem.price*item.quantity)
         total=subtotal-tax
-    print(subtotal, total)
     return dict(total=total, subtotal=subtotal, tax=tax)

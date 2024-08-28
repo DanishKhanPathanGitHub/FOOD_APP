@@ -156,7 +156,14 @@
 										</div>
 									</form>
 									<!-- My Restaurants Form End -->
-                            
+									{% if user_profile_form.errors %}
+									<h5>user profile form errors:</h5>
+										{{ user_profile_form.errors }}
+									{% endif %}
+									{% if vendor_form.errors%}
+									<h5>Vendor form errors</h5>
+									{{ vendor_form.errors }}
+									{% endif %}
                         </div>
                     </div>
                 </div>

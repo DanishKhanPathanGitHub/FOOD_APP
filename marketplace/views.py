@@ -1,11 +1,17 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from vendor.models import Vendor
 from menu.models import foodCategory, foodItem
 from django.db.models import Prefetch
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .models import Cart
 from .contextProcessor import get_cart_counter, get_cart_total
+
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
+
 # Create your views here.
 
 
@@ -138,3 +144,38 @@ def delete_cart(request, cart_id):
         else:
             return JsonResponse({'status':'Failed', 'message':'invalid request'})
         
+def search(request):
+    if not "address" in request.GET:
+        return redirect('marketplace')
+
+    address = request.GET["address"]
+    latitude = request.GET["lat"]
+    longiitude = request.GET["long"]
+    radius = request.GET["radius"]
+    name = request.GET["keyword"]
+
+    vendors = Vendor.objects.filter(
+        Q(
+            id__in=foodItem.objects.filter(
+                food_name__icontains=name, is_available=True  
+            ).values_list('vendor')
+        ) |
+        Q(
+            vendor_name__icontains=name, is_approved=True, user__is_active=True,
+
+        ) 
+    )
+    if longiitude and latitude and radius:
+        pnt = GEOSGeometry(f"POINT({longiitude} {latitude})")
+        vendors = vendors.filter(
+            vendor_profile__location__distance_lte=(pnt, D(km=radius))
+        ).annotate(
+        distance=Distance('vendor_profile__location', pnt)
+    ).order_by('distance')
+    
+    context = {
+        "vendors": vendors,
+        "vendors_count": vendors.count(),
+    }
+
+    return render(request, 'marketplace/listings.html', context)

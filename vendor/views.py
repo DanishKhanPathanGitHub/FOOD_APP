@@ -9,6 +9,7 @@ from accounts.views import check_role_vendor
 from menu.models import foodCategory, foodItem
 from menu.forms import foodCategoryForm, foodItemForm
 from django.template.defaultfilters import slugify
+import random
 # Create your views here.
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
@@ -65,14 +66,8 @@ def category_add(request):
         #print("request is post")
         category_form = foodCategoryForm(request.POST)
         if category_form.is_valid():
-            #print('form is valid')
-            category_name = category_form.cleaned_data['category_name']
             category = category_form.save(commit=False)
-            #print('category_name:', category_name)
-            category.slug = slugify(category_name)
             category.vendor = Vendor.objects.get(user=request.user)
-            #print('category.slug: ', category_form.slug)
-            #print('category.vendor: ', category_form.vendor)
             category_form.save()
             messages.success(request, "category added succesfully")
             return  redirect('menu_manager')
@@ -95,9 +90,7 @@ def category_edit(request, pk=None):
     if request.POST:
         category_form = foodCategoryForm(request.POST, instance=category)
         if category_form.is_valid():
-            category_name = category_form.cleaned_data['category_name']
             category = category_form.save(commit=False)
-            category.slug = slugify(category_name)
             category.vendor = Vendor.objects.get(user=request.user)
             category_form.save()
             messages.success(request, "category updated succesfully")
@@ -133,9 +126,7 @@ def food_add(request):
     if request.POST:
         food_item_form = foodItemForm(request.POST, request.FILES, vendor_id=vendor.id)
         if food_item_form.is_valid():
-            food_name = food_item_form.cleaned_data['food_name']
             food_item = food_item_form.save(commit=False)
-            food_item.slug = slugify(food_name)
             food_item.vendor = Vendor.objects.get(user=request.user)
             food_item_form.save()
             messages.success(request, "food item added succesfully")
@@ -157,9 +148,7 @@ def food_edit(request, pk=None):
     if request.POST:
         food_item_form = foodItemForm(request.POST, request.FILES, instance=food, vendor_id=vendor.id)
         if food_item_form.is_valid():
-            food_item_name = food_item_form.cleaned_data['food_name']
             food_item = food_item_form.save(commit=False)
-            food_item.slug = slugify(food_item_name)
             food_item.vendor = Vendor.objects.get(user=request.user)
             food_item_form.save()
             messages.success(request, "food updated succesfully")

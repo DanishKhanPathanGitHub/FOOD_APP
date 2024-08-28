@@ -49,6 +49,14 @@
                                                     {% endif %}
                                                 </small>
                                             </span>
+                                            <br>
+                                            <span>
+                                                <small>
+                                                    {% if vendor.distance %}
+                                                    <b>{{vendor.distance.km|floatformat:2}}km away</b> 
+                                                    {% endif %}
+                                                </small>
+                                            </span>
                                         </div>
                                         <div class="list-option">
 

@@ -5,8 +5,8 @@ from vendor.models import *
 
 class foodCategory(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    category_name = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(max_length=100, unique=True)
+    category_name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=100, unique=False)
     description = models.TextField(max_length=250, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -25,7 +25,7 @@ class foodItem(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category = models.ForeignKey(foodCategory, on_delete=models.CASCADE, related_name='fooditems')
     food_name = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=False)
     description = models.TextField(max_length=250, blank=True)
     image = models.ImageField(upload_to='foodimages', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)

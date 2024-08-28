@@ -22,7 +22,7 @@ class userProfileForm(forms.ModelForm):
     profile_pic=forms.ImageField(widget=forms.FileInput(attrs={"class":"btn-btn-info"}))
     cover_pic=forms.ImageField(widget=forms.FileInput(attrs={"class":"btn-btn-info"}))
     #one way to make field readonly
-    lattitued=forms.ImageField(widget=forms.TextInput(attrs={"readonly":"readonly"}))
+    latitude=forms.CharField(widget=forms.TextInput(attrs={"readonly":"readonly"}))
     
     class Meta:
         model = userProfile
