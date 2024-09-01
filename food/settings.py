@@ -70,7 +70,8 @@ TEMPLATES = [
                 'accounts.contextProcessor.get_vednor',
                 'marketplace.contextProcessor.get_cart_counter',
                 'marketplace.contextProcessor.get_cart_total',
-                'accounts.contextProcessor.get_google_api'
+                'accounts.contextProcessor.get_google_api',
+                'food.contextProcessor.location_data',
             ],
         },
     },
