@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from vendor.models import Vendor
+from vendor.models import Vendor, OpeningHours
 from menu.models import foodCategory, foodItem
 from django.db.models import Prefetch
 from django.db.models import Q
@@ -11,7 +11,7 @@ from .contextProcessor import get_cart_counter, get_cart_total
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
-
+import datetime
 # Create your views here.
 
 
@@ -33,6 +33,29 @@ def vendor_detail(request, slug):
             queryset = foodItem.objects.filter(is_available=True)
         )
     )
+    today = datetime.date.today().isoweekday()
+    opening_hours = OpeningHours.objects.filter(vendor=vendor)
+    if opening_hours:
+        today_hours = opening_hours.filter(day=today)[0]
+
+        from_hour = today_hours.from_hour  # e.g., "11:20 PM"
+        to_hour = today_hours.to_hour      # e.g., "05:00 PM"
+
+        # Convert the string times to datetime objects
+        from_time = datetime.datetime.strptime(from_hour, "%I:%M %p").time()
+        to_time = datetime.datetime.strptime(to_hour, "%I:%M %p").time()
+
+        # Get the current time
+        curr_time = datetime.datetime.now().time()
+        print(curr_time, from_time, to_time)
+        if from_time <= curr_time <= to_time:
+            is_open = True
+        else:
+            is_open = False
+    else:
+        today_hours = None
+        is_open = False
+        print("The restaurant is closed.")
 
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
@@ -42,6 +65,9 @@ def vendor_detail(request, slug):
         "vendor": vendor,
         "categories":categories,
         "cart_items":cart_items,
+        "opening_hours":opening_hours,
+        "today_hour":today_hours,
+        "is_open":is_open,
     }
     return render(request, 'marketplace/vendor_detail.html', context)
 

@@ -35,3 +35,54 @@ class Vendor(models.Model):
                     mail_subject = "Your restaurant has been suspended"
                     send_notification(mail_subject, email_template, context)
         return super(Vendor, self).save(*args, **kwargs)
+
+DAYS = [
+    (1, ("Monday")),
+    (2, ("Tuesday")),
+    (3, ("Wednesday")),
+    (4, ("Thursday")),
+    (5, ("Friday")),
+    (6, ("Saturday")),
+    (7, ("Sunday"))
+]
+HOURS_OF_DAY = [
+    ('12:30 AM', '12:30 AM'),
+    ('01:30 AM', '01:30 AM'),
+    ('02:30 AM', '02:30 AM'),
+    ('03:30 AM', '03:30 AM'),
+    ('04:30 AM', '04:30 AM'),
+    ('05:30 AM', '05:30 AM'),
+    ('06:30 AM', '06:30 AM'),
+    ('07:30 AM', '07:30 AM'),
+    ('08:30 AM', '08:30 AM'),
+    ('09:30 AM', '09:30 AM'),
+    ('10:30 AM', '10:30 AM'),
+    ('11:30 AM', '11:30 AM'),
+    ('12:30 PM', '12:30 PM'),
+    ('01:30 PM', '01:30 PM'),
+    ('02:30 PM', '02:30 PM'),
+    ('03:30 PM', '03:30 PM'),
+    ('04:30 PM', '04:30 PM'),
+    ('05:30 PM', '05:30 PM'),
+    ('06:30 PM', '06:30 PM'),
+    ('07:30 PM', '07:30 PM'),
+    ('08:30 PM', '08:30 PM'),
+    ('09:30 PM', '09:30 PM'),
+    ('10:30 PM', '10:30 PM'),
+    ('11:30 PM', '11:30 PM'),
+    ('12:00 AM', '00:00 AM'),
+]
+class OpeningHours(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    day = models.IntegerField(choices=DAYS)
+    from_hour = models.CharField(choices=HOURS_OF_DAY, blank=True)
+    to_hour = models.CharField(choices=HOURS_OF_DAY, blank=True)
+    is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('day', 'from_hour')
+        unique_together = ('vendor', 'day')
+
+    def __str__(self) -> str:
+        return self.get_day_display()
+    

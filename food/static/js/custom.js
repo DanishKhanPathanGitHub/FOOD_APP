@@ -14,6 +14,28 @@ function initAutoComplete() {
     autocomplete.addListener('place_changed', onPlaceChanged);
 }
  
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle the dropdown menu when the trigger is clicked
+    const dropdownTrigger = document.querySelector('.dropdown > a');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    dropdownTrigger.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent default link behavior
+        event.stopPropagation(); // Prevent event bubbling
+        dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // Close the dropdown menu when clicking outside of it
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.dropdown')) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+});
+
+
+
+
 function onPlaceChanged() {
     var place = autocomplete.getPlace();
  
@@ -190,4 +212,71 @@ $(document).ready(function(){
         }
     }
 
+    $('.add_hour').on('click', function(e){
+        e.preventDefault();
+        var day = document.getElementById('id_day').value;
+        var from_hour = document.getElementById('id_from_hour').value;
+        var to_hour = document.getElementById('id_to_hour').value;
+        var is_closed = document.getElementById('id_is_closed').checked;
+        var csrf_token = $('input[name=csrfmiddlewaretoken]').val();
+        var url = document.getElementById('add_hour_url').value;
+
+        condition = "(is_closed && from_hour == '' && to_hour == '') || (is_closed == '' && from_hour != '' && to_hour != '') "
+        if(day != ''){
+            if (eval(condition)) {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'day':day,
+                        'from_hour':from_hour,
+                        'to_hour':to_hour,
+                        'is_closed':is_closed,
+                        'csrfmiddlewaretoken':csrf_token,
+                    },
+                    success: function(response){
+                        if (response.status == 'success') {
+                            if (response.is_closed == 'Closed') {
+                                html = `<tr id="hour-${response.id}"><td><b>${response.day}</b></td><td>Closed</td><td><a class='delete_hour' data-id='${response.id}' data-url='/vendor/opening_hours/delete/${response.id}'>Remove</a></td></tr>`;
+                            } else {
+                                html = `<tr id="hour-${response.id}"><td><b>${response.day}</b></td><td>${response.from_hour} - ${response.to_hour}</td><td><a class='delete_hour' data-id='${response.id}' data-url='/vendor/opening_hours/delete/${response.id}'>Remove</a></td></tr>`;
+                            }                            
+                            $('.opening_hours').append(html)
+                            document.getElementById('opening_hours').reset();
+                        }else{
+                            swal(response.message, '', "error")
+                        }
+                        
+                    }
+                })   
+            } else {
+                swal('select hours or closed, you cannot select both. \
+                fill both from and to hours fields if you are filling hours', '')
+            }
+            
+        }else{
+           swal("Please fill the required fields", '');
+        }
+    })
+
+    $('body').on('click', '.delete_hour', function(e){
+        e.preventDefault();
+    
+        const hour_id = $(this).attr('data-id');
+        const url = $(this).attr('data-url');
+    
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+                if(response.status === 'success'){
+                    $('#hour-' + hour_id).remove();  // Remove the table row on successful deletion
+                    swal(response.status, response.message, "success");
+                } else {
+                    swal(response.status, response.message, "error");
+                }
+            }
+        });
+    });
+    
 });
