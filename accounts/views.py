@@ -138,7 +138,6 @@ def myAccount(request):
         redirecturl = 'custDashboard'
     elif user.role == 2:
         redirecturl = 'vendorDashboard'
-        print('redirect url is :', redirecturl )
     elif user.role and user.is_active == True:
         redirecturl = 'admin/'
     

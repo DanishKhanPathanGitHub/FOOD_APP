@@ -20,16 +20,21 @@ class userForm(forms.ModelForm):
 class userProfileForm(forms.ModelForm):
     address=forms.CharField(widget=forms.TextInput(attrs={"required":"required", "placeholder":"start typing..."}))
     profile_pic=forms.ImageField(widget=forms.FileInput(attrs={"class":"btn-btn-info"}))
-    cover_pic=forms.ImageField(widget=forms.FileInput(attrs={"class":"btn-btn-info"}))
     #one way to make field readonly
     latitude=forms.CharField(widget=forms.TextInput(attrs={"readonly":"readonly"}))
     
     class Meta:
         model = userProfile
-        fields = ["profile_pic", "cover_pic", "address", "country", "state", "city", "pincode","latitude", "longitude",]
+        fields = ["profile_pic", "address", "country", "state", "city", "pincode","latitude", "longitude",]
     #over-ridding method for making field readonly
     def __init__(self, *args, **kwargs):
         super(userProfileForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if field=='longitude':
                 self.fields[field].widget.attrs['readonly']='readonly'
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('firstname', 'lastname', 'phone_no')

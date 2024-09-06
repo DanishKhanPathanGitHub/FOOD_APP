@@ -2,6 +2,9 @@ from collections.abc import Iterable
 from django.db import models
 from accounts.models import User, userProfile
 from accounts.utils import send_notification
+
+from django.core.exceptions import ValidationError
+from datetime import datetime
 # Create your models here.
 
 class Vendor(models.Model):
@@ -10,6 +13,7 @@ class Vendor(models.Model):
         userProfile, related_name = 'userProfile', on_delete=models.CASCADE
     )
     vendor_name = models.CharField(max_length=50)
+    cover_pic = models.ImageField(upload_to='users/cover_pics', blank=True, null=True)
     slug = models.SlugField(max_length=100, unique=True)
     vendor_license = models.ImageField(upload_to='vendor/license')
     is_approved = models.BooleanField(default=False)
@@ -20,21 +24,35 @@ class Vendor(models.Model):
         return self.vendor_name
 
     def save(self, *args, **kwargs):
-        if self.pk is not None:
+        is_new = self.pk is None  # Check if this is a new Vendor
+
+        if is_new:
+            super(Vendor, self).save(*args, **kwargs)  # Save the Vendor first
+            # Create OpeningHours for each day if this is a new Vendor
+            for day_value, day_name in DAYS:
+                OpeningHours.objects.get_or_create(
+                    vendor=self,
+                    day=day_value,
+                    is_closed=True
+                )
+        else:
+
+            # Check for changes in the is_approved field and send an email if needed
             previous_record = Vendor.objects.get(pk=self.pk)
             if previous_record.is_approved != self.is_approved:
                 email_template = 'emails/email_approval_notification.html'
                 context = {
-                    "user" : self.user,
-                    "is_approved" : self.is_approved,
+                    "user": self.user,
+                    "is_approved": self.is_approved,
                 }
-                if self.is_approved == True:
+                if self.is_approved:
                     mail_subject = "Your restaurant has been approved"
-                    send_notification(mail_subject, email_template, context)
                 else:
                     mail_subject = "Your restaurant has been suspended"
-                    send_notification(mail_subject, email_template, context)
-        return super(Vendor, self).save(*args, **kwargs)
+                
+                send_notification(mail_subject, email_template, context)
+            super(Vendor, self).save(*args, **kwargs) 
+
 
 DAYS = [
     (1, ("Monday")),
@@ -85,4 +103,5 @@ class OpeningHours(models.Model):
 
     def __str__(self) -> str:
         return self.get_day_display()
+    
     

@@ -74,7 +74,6 @@ class User(AbstractBaseUser):
 class userProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='users/profile_pics', blank=True, null=True)
-    cover_pic = models.ImageField(upload_to='users/cover_pics', blank=True, null=True)
     address = models.CharField(max_length=300,blank=True, null=True)
     country = models.CharField(max_length=50)
     state = models.CharField(max_length=50)

@@ -4,7 +4,7 @@
 
 <!-- Main Section Start -->
 <div class="main-section">
-    {% include "profileHeader.html" %}
+    {% include "vendor/profileHeader.html" %}
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
@@ -58,7 +58,7 @@
 																		<li class="gal-img">
 																			<div class="drag-list">
 																				<div class="item-thumb">
-																					<img class="thumbnail" src="{% if user_profile.cover_pic %}{{user_profile.cover_pic.url}}{% else %}{% static "images/default-cover.png" %}{% endif %}" alt="">
+																					<img class="thumbnail" src="{% if vendor.cover_pic %}{{vendor.cover_pic.url}}{% else %}{% static "images/default-cover.png" %}{% endif %}" alt="">
 																				</div>
 																			</div>
 																		</li>
@@ -67,10 +67,10 @@
 																<div class="text-holder">
 																	<label>Update Cover Photo</label>
 																	<div class="upload-gallery">
-																		{{user_profile_form.cover_pic}}
+																		{{vendor_form.cover_pic}}
 																	</div>
 																</div>
-																{{user_profile_form.cover_pic.errors}}
+																{{vendor_form.cover_pic.errors}}
 															</div>
 														</div>
 														<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">

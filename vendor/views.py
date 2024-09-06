@@ -199,54 +199,36 @@ def opening_hours_add(request):
             to_hour = request.POST.get('to_hour')
             is_closed = request.POST.get('is_closed')=='true'
 
-            try:
-                hour = OpeningHours.objects.create(vendor=vendor, day=day, from_hour=from_hour, to_hour=to_hour, is_closed=is_closed)
-                if hour:
-                    object = OpeningHours.objects.get(id=hour.id)
-                    if object.is_closed:
-                        response = {
-                            'status':'success', 'id':object.id, 
-                            'day':object.get_day_display(), 
-                            'is_closed':'Closed'
-                        }
-                    else:
-                        response = {
-                            'status':'success', 'id':object.id, 
-                            'day':object.get_day_display(), 
-                            'from_hour':object.from_hour, 'to_hour':object.to_hour
-                        }
-                return JsonResponse(response)
-            
-            except Exception as e:
-                try:
-                    existing_day = OpeningHours.objects.get(vendor=vendor, day=day)
-                    message = f'entry for the {existing_day.get_day_display()} already exist'
-                except:
-                    existing_day = None
-                    message = f'Invalid entry'
-                response = {
-                    'status':'Entry updated for', 
-                    'message':message,
-                }
+            hour = OpeningHours.objects.get(vendor=vendor, day=day)
+            if hour:
+                hour.from_hour = from_hour
+                hour.to_hour = to_hour
+                hour.is_closed = is_closed
+                time_format = "%I:%M %p"
+                from_time = datetime.strptime(from_hour, time_format)
+                to_time = datetime.strptime(to_hour, time_format)
+
+                if to_time <= from_time:
+                    response = {
+                        'status':'Failure',
+                        'message':f'from_hour should be earlier than to_hour'
+                    }
+                    return JsonResponse(response)
+                
+                hour.save()
+                if hour.is_closed:
+                    response = {
+                        'status':'success', 'id':hour.id, 
+                        'is_closed':'Closed',
+                        'message':f'{hour.get_day_display()} set to closed'
+                    }
+                else:
+                    response = {
+                        'status':'success', 'id':hour.id,
+                        'from_hour':hour.from_hour, 'to_hour':hour.to_hour,
+                        'message':f'Timing for {hour.get_day_display()} updated'
+                    }
                 return JsonResponse(response)
         else:
             return HttpResponse("Invalid request")
         
-
-@user_passes_test(check_role_vendor)
-def opening_hours_delete(request, hour_id):
-    if request.user.is_authenticated:
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            try:
-                hour = OpeningHours.objects.get(id=hour_id)
-                if hour:
-                    name = hour.get_day_display()
-                    hour.delete()   
-                    return JsonResponse({
-                        'status':'success',
-                        'message':f'entry for {name} deleted', 
-                    })   
-            except:
-                return JsonResponse({'status':'Failed', 'message':'This entry does not exist'})
-        else:
-            return JsonResponse({'status':'Failed', 'message':'invalid request'})

@@ -18,6 +18,5 @@ urlpatterns = [
 
     path('opening_hours/', views.opening_hours, name="opening_hours"),
     path('opening_hours/add/', views.opening_hours_add, name="opening_hours_add"),
-    path('opening_hours/delete/<int:hour_id>', views.opening_hours_delete, name="opening_hours_delete"),
 ]
 

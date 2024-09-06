@@ -26,13 +26,12 @@
                                     <li>
                                         <div class="img-holder">
                                             <figure>
-                                                {% if vendor.vendor_profile.cover_pic %}
+                                                {% if vendor.vendor_profile.profile_pic %}
                                                 <a href="#"><img src="{{vendor.vendor_profile.profile_pic.url}}" class="img-list wp-post-image" alt=""></a>
                                                 {% else %}
                                                 <a href="#"><img src="{% static "images/default-profile.png" %}" class="img-list wp-post-image" alt=""></a>
                                                 {% endif %}
                                             </figure>
-                                            <span class="restaurant-status close"><em class="bookmarkRibbon"></em>Close</span>
                                         </div>
                                         <div class="text-holder">
                                             

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'vendor.apps.VendorConfig',
     'menu',
+    'customer',
     'marketplace',
     'django.contrib.gis'
 ]

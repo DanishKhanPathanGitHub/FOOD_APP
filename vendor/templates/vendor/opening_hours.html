@@ -4,7 +4,7 @@
 
 <!-- Main Section Start -->
 <div class="main-section">
-    {% include "profileHeader.html" %}
+    {% include "vendor/profileHeader.html" %}
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
@@ -34,12 +34,7 @@
                                             {% else %}
                                             {{hour.from_hour}} - {{hour.to_hour}}
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <a class="delete_hour" data-id="{{ hour.id }}" data-url="{% url 'opening_hours_delete' hour.id %}">
-                                                Remove
-                                            </a>
-                                        </td>   
+                                        </td>  
                                         </tr>
                                     {% endfor %}
                                 </tbody>

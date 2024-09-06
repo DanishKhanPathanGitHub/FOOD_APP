@@ -80,22 +80,26 @@
                                             <li style="list-style-type: none;">
                                                 Subtotal
                                                 <span class="price float-right">
-                                                    <span class="currency">$</span>
-                                                    <span id="subtotal">{{subtotal}}</span>
+                                                    <span class="currency">Rs</span>
+                                                    <span class="subtotal">{{subtotal}}</span>
                                                 </span>
                                             </li>
+                                            {% for taxtype, value in taxes.items %}
                                             <li style="list-style-type: none;">
-                                                Tax
+                                                {{taxtype}} - {{value.0}}%
                                                 <span class="price float-right">
-                                                    <span class="currency">$</span>
-                                                    <span id="tax">{{tax}}</span>
+                                                    <span class="currency">Rs</span>
+                                                    <span id="tax-{{taxtype}}">{{value.1}}</span>
                                                 </span>
-                                            </li>
+                                            {% endfor %}
                                             <li style="list-style-type: none; font-weight: 600;">
                                                 Total
                                                 <span class="price float-right">
-                                                    <span class="currency">$</span>
+                                                    <span class="currency">Rs</span>
+                                                    <span class="subtotal">{{subtotal}}</span> + 
+                                                    <span id="taxtotal">{{taxtotal}}</span>:
                                                     <span id="total">{{total}}</span>
+                                                    
                                                 </span>
                                             </li>
                                         </ul>

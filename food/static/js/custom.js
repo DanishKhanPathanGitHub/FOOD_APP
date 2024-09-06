@@ -108,8 +108,9 @@ $(document).ready(function(){
                     //subtotal, tax, total
                     getCartAmoounts(
                         response.get_cart_total['subtotal'],
-                        response.get_cart_total['tax'],
+                        response.get_cart_total['taxtotal'],
                         response.get_cart_total['total'],
+                        response.get_cart_total['taxes'],
                     )
                 }
             }
@@ -151,8 +152,9 @@ $(document).ready(function(){
                     //subtotal, tax, total
                     getCartAmoounts(
                         response.get_cart_total['subtotal'],
-                        response.get_cart_total['tax'],
+                        response.get_cart_total['taxtotal'],
                         response.get_cart_total['total'],
+                        response.get_cart_total['taxes'],
                     )
                 }
             }
@@ -181,8 +183,9 @@ $(document).ready(function(){
                     //subtotal, tax, total
                     getCartAmoounts(
                         response.get_cart_total['subtotal'],
-                        response.get_cart_total['tax'],
+                        response.get_cart_total['taxtotal'],
                         response.get_cart_total['total'],
+                        response.get_cart_total['taxes'],
                     )
                 }
             }
@@ -203,16 +206,25 @@ $(document).ready(function(){
     }
 
 
-    function getCartAmoounts(subtotal, tax, total){
+    function getCartAmoounts(subtotal, taxtotal, total, taxes) {
         if (window.location.pathname == '/cart/') {
-            $('#subtotal').html(subtotal)
-            $('#tax').html(tax)
-            $('#total').html(total)
-
+            // Update subtotal and total
+            $('.subtotal').html(subtotal);
+            $('#total').html(total);
+            $('#taxtotal').html(taxtotal);
+    
+            // Update each tax type individually
+            $.each(taxes, function(taxtype, taxes) {
+                var taxPercentage = taxes[0]; // This is the tax percentage
+                var taxAmount = taxes[1];     // This is the tax amount
+    
+                // Update the tax amount in the DOM based on the tax type
+                $('#tax-' + taxtype).html(taxAmount);
+            });
         }
     }
 
-    $('.add_hour').on('click', function(e){
+    $('.add_hour').on('click', function(e) {
         e.preventDefault();
         var day = document.getElementById('id_day').value;
         var from_hour = document.getElementById('id_from_hour').value;
@@ -220,63 +232,50 @@ $(document).ready(function(){
         var is_closed = document.getElementById('id_is_closed').checked;
         var csrf_token = $('input[name=csrfmiddlewaretoken]').val();
         var url = document.getElementById('add_hour_url').value;
-
-        condition = "(is_closed && from_hour == '' && to_hour == '') || (is_closed == '' && from_hour != '' && to_hour != '') "
-        if(day != ''){
+    
+        // Condition to validate the form input
+        var condition = "(is_closed && from_hour == '' && to_hour == '') || (!is_closed && from_hour != '' && to_hour != '')";
+        if (day != '') {
             if (eval(condition)) {
                 $.ajax({
                     type: 'POST',
                     url: url,
                     data: {
-                        'day':day,
-                        'from_hour':from_hour,
-                        'to_hour':to_hour,
-                        'is_closed':is_closed,
-                        'csrfmiddlewaretoken':csrf_token,
+                        'day': day,
+                        'from_hour': from_hour,
+                        'to_hour': to_hour,
+                        'is_closed': is_closed,
+                        'csrfmiddlewaretoken': csrf_token,
                     },
-                    success: function(response){
+                    success: function(response) {
                         if (response.status == 'success') {
+                            var existingRow = $(`#hour-${response.id}`);
+                            var html;
+    
                             if (response.is_closed == 'Closed') {
-                                html = `<tr id="hour-${response.id}"><td><b>${response.day}</b></td><td>Closed</td><td><a class='delete_hour' data-id='${response.id}' data-url='/vendor/opening_hours/delete/${response.id}'>Remove</a></td></tr>`;
+                                html = `Closed`;
                             } else {
-                                html = `<tr id="hour-${response.id}"><td><b>${response.day}</b></td><td>${response.from_hour} - ${response.to_hour}</td><td><a class='delete_hour' data-id='${response.id}' data-url='/vendor/opening_hours/delete/${response.id}'>Remove</a></td></tr>`;
-                            }                            
-                            $('.opening_hours').append(html)
+                                html = `${response.from_hour} - ${response.to_hour}`;
+                            }
+    
+                            // Update the existing row
+                            existingRow.find('td:nth-child(2)').html(html);
+    
                             document.getElementById('opening_hours').reset();
-                        }else{
-                            swal(response.message, '', "error")
+                            swal(response.message, '', 'success');
+                        } else {
+                            swal(response.message, '', 'error');
+                            console.log(response.message)
                         }
-                        
                     }
-                })   
+                });
             } else {
-                swal('select hours or closed, you cannot select both. \
-                fill both from and to hours fields if you are filling hours', '')
+                swal('Select hours or closed. You cannot select both. Fill both "from" and "to" hour fields if you are filling hours.', '', 'error');
             }
-            
-        }else{
-           swal("Please fill the required fields", '');
+        } else {
+            swal("Please fill the required fields", '', 'error');
         }
-    })
-
-    $('body').on('click', '.delete_hour', function(e){
-        e.preventDefault();
-    
-        const hour_id = $(this).attr('data-id');
-        const url = $(this).attr('data-url');
-    
-        $.ajax({
-            type: 'GET',
-            url: url,
-            success: function(response){
-                if(response.status === 'success'){
-                    $('#hour-' + hour_id).remove();  // Remove the table row on successful deletion
-                    swal(response.status, response.message, "success");
-                } else {
-                    swal(response.status, response.message, "error");
-                }
-            }
-        });
     });
     
+
 });
