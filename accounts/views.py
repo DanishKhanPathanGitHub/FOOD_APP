@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from .utils import check_role_customer, check_role_vendor, send_verification_email
-
+from orders.models import Order
 # Create your views here.
 
 
@@ -151,7 +151,12 @@ def vendorDashboard(request):
 @login_required(login_url='login') 
 @user_passes_test(check_role_customer)   
 def custDashboard(request):
-    return render(request, 'accounts/custDashboard.html')
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('created_at')[:6]
+    context = {
+        'orders':orders,
+        'total_orders':orders.count(),
+    }
+    return render(request, 'accounts/custDashboard.html', context)
 
 def forgot_password(request):
     if request.POST:

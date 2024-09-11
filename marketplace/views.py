@@ -4,8 +4,12 @@ from vendor.models import Vendor, OpeningHours
 from menu.models import foodCategory, foodItem
 from django.db.models import Prefetch
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from accounts.utils import check_role_customer
+from accounts.models import User, userProfile
 from .models import Cart
+from orders.forms import OrderForm
+
 from .contextProcessor import get_cart_counter, get_cart_total
 
 from django.contrib.gis.geos import GEOSGeometry
@@ -205,3 +209,29 @@ def search(request):
     }
 
     return render(request, 'marketplace/listings.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
+def checkout(request):
+    cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
+    if get_cart_counter(request)["cart_count"] < 1:
+        return redirect('marketplace')
+    user = request.user
+    user_profile = userProfile.objects.get(user=user)
+    initial_values = {
+        'firstname':user.firstname,
+        'lastname':user.lastname,
+        'email':user.email,
+        'phone_no':user.phone_no,
+        'address':user_profile.address,
+        'country':user_profile.country,
+        'state':user_profile.state,
+        'city':user_profile.city,
+        'pincode':user_profile.pincode,
+    }
+    order_form = OrderForm(initial=initial_values)
+    context = {
+        'order_form': order_form,
+        'cart_items':cart_items,
+    }
+    return render(request, 'marketplace/checkout.html', context)

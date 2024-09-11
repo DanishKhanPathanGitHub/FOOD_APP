@@ -37,11 +37,11 @@ def send_verification_email(request, user, mail_subject, email_template):
 
    # 'emails/reset_password_validate.html'
     
-def send_notification(mail_subject, email_template, context):
+def send_notification(mail_subject, email_template, context, to_emails:list=None):
     from_email = settings.DEFAULT_FROM_EMAIL
     message = render_to_string(email_template, context)
-    user = context['user']
-    mail = EmailMessage(mail_subject, message, from_email, to=[user.email])
+    to_emails = to_emails if to_emails else [context['user'].email]
+    mail = EmailMessage(mail_subject, message, from_email, to=to_emails)
     mail.send()
 
 def image_validator(value):

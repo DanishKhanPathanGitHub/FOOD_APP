@@ -28,6 +28,8 @@ urlpatterns = ( [
     path('cart/', V.cart, name='cart'),
 
     path('search/', V.search, name="search"),
+    path('checkout/', V.checkout, name="checkout"),
+    path('orders/', include('orders.urls'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
