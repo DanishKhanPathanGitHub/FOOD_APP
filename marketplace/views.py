@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpRequest, JsonResponse
+from django.contrib import messages
 from vendor.models import Vendor, OpeningHours
 from menu.models import foodCategory, foodItem
 from django.db.models import Prefetch
@@ -41,21 +42,23 @@ def vendor_detail(request, slug):
     opening_hours = OpeningHours.objects.filter(vendor=vendor)
     if opening_hours:
         today_hours = opening_hours.filter(day=today)[0]
-
-        from_hour = today_hours.from_hour  # e.g., "11:20 PM"
-        to_hour = today_hours.to_hour      # e.g., "05:00 PM"
-
-        # Convert the string times to datetime objects
-        from_time = datetime.datetime.strptime(from_hour, "%I:%M %p").time()
-        to_time = datetime.datetime.strptime(to_hour, "%I:%M %p").time()
-
-        # Get the current time
-        curr_time = datetime.datetime.now().time()
-        print(curr_time, from_time, to_time)
-        if from_time <= curr_time <= to_time:
-            is_open = True
-        else:
+        if today_hours.is_closed:
             is_open = False
+        else:
+            from_hour = today_hours.from_hour 
+            to_hour = today_hours.to_hour     
+
+            # Convert the string times to datetime objects
+            from_time = datetime.datetime.strptime(from_hour, "%I:%M %p").time()
+            to_time = datetime.datetime.strptime(to_hour, "%I:%M %p").time()
+
+            # Get the current time
+            curr_time = datetime.datetime.now().time()
+            print(curr_time, from_time, to_time)
+            if from_time <= curr_time <= to_time:
+                is_open = True
+            else:
+                is_open = False
     else:
         today_hours = None
         is_open = False
@@ -75,6 +78,7 @@ def vendor_detail(request, slug):
     }
     return render(request, 'marketplace/vendor_detail.html', context)
 
+@user_passes_test(check_role_customer)
 def add_to_cart(request, food_id=None):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -128,6 +132,7 @@ def add_to_cart(request, food_id=None):
             }
         )
 
+@user_passes_test(check_role_customer)
 def decrease_cart(request, food_id=None):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -154,6 +159,7 @@ def decrease_cart(request, food_id=None):
         return JsonResponse({'status':'login_required', 'message':'login to continue'})    
     
 @login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def cart(request):
     cart_items = Cart.objects.filter(user=request.user).order_by('created_at')
     context = {
@@ -161,6 +167,7 @@ def cart(request):
     }
     return render(request, 'marketplace/cart.html', context)
 
+@user_passes_test(check_role_customer)
 def delete_cart(request, cart_id):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -173,14 +180,14 @@ def delete_cart(request, cart_id):
                 return JsonResponse({'status':'Failed', 'message':'cart item does not exist'})
         else:
             return JsonResponse({'status':'Failed', 'message':'invalid request'})
-        
+
 def search(request):
     if not "address" in request.GET:
         return redirect('marketplace')
 
     address = request.GET["address"]
     latitude = request.GET["lat"]
-    longiitude = request.GET["long"]
+    longitude = request.GET["long"]
     radius = request.GET["radius"]
     name = request.GET["keyword"]
 
@@ -195,8 +202,8 @@ def search(request):
 
         ) 
     )
-    if longiitude and latitude and radius:
-        pnt = GEOSGeometry(f"POINT({longiitude} {latitude})")
+    if longitude and latitude and radius:
+        pnt = GEOSGeometry(f"POINT({longitude} {latitude})")
         vendors = vendors.filter(
             vendor_profile__location__distance_lte=(pnt, D(km=radius))
         ).annotate(
@@ -218,6 +225,34 @@ def checkout(request):
         return redirect('marketplace')
     user = request.user
     user_profile = userProfile.objects.get(user=user)
+    
+
+    #checking if item in cart is available or not, and vendor providing item is closed or not
+    for item in cart_items:
+        if item.fooditem.is_available == False:
+            messages.error(request, f'food item: {item.fooditem.food_name} is not available right now')
+            return redirect('cart')
+        today_hours = OpeningHours.objects.get(vendor=item.fooditem.vendor, day=datetime.date.today().isoweekday())
+        is_open = False
+        if today_hours.is_closed:
+            pass
+        else:
+            from_hour = today_hours.from_hour 
+            to_hour = today_hours.to_hour     
+
+            from_time = datetime.datetime.strptime(from_hour, "%I:%M %p").time()
+            to_time = datetime.datetime.strptime(to_hour, "%I:%M %p").time()
+
+            curr_time = datetime.datetime.now().time()
+            if from_time <= curr_time <= to_time:
+                is_open = True
+            else:
+                pass
+        if not is_open:
+            messages.error(request, f'you have {item.fooditem.food_name} in your cart, which is served by {item.fooditem.vendor.vendor_name}! Which is closed right now!')
+            return redirect('cart')
+
+
     initial_values = {
         'firstname':user.firstname,
         'lastname':user.lastname,

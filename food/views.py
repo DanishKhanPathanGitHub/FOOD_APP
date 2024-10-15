@@ -16,7 +16,7 @@ def home(request):
         request.session['location'] = location
         request.session['lat'] = lat
         request.session['long'] = long
-
+        
     location = request.session.get('location', '')
     lat = request.session.get('lat', '')
     long = request.session.get('long', '')
@@ -25,10 +25,12 @@ def home(request):
     if long and lat:
         pnt = GEOSGeometry(f"POINT({long} {lat})")
         vendors = vendors.filter(
-            vendor_profile__location__distance_lte=(pnt, D(km=125))
+            vendor_profile__location__distance_lte=(pnt, D(km=75))
         ).annotate(
         distance=Distance('vendor_profile__location', pnt)
     ).order_by('distance')[:6]
+        
+    
 
     context = {
         "vendors":vendors,

@@ -64,7 +64,7 @@ DAYS = [
     (7, ("Sunday"))
 ]
 HOURS_OF_DAY = [
-    ('12:30 AM', '12:30 AM'),
+    ('12:00 AM', '12:00 AM'),
     ('01:30 AM', '01:30 AM'),
     ('02:30 AM', '02:30 AM'),
     ('03:30 AM', '03:30 AM'),
@@ -88,7 +88,7 @@ HOURS_OF_DAY = [
     ('09:30 PM', '09:30 PM'),
     ('10:30 PM', '10:30 PM'),
     ('11:30 PM', '11:30 PM'),
-    ('12:00 AM', '00:00 AM'),
+    ('11:59 PM', '11:59 PM'),
 ]
 class OpeningHours(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)

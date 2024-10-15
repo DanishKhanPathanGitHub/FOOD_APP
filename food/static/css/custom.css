@@ -74,3 +74,91 @@
     padding: 5px;
     transition-duration:0.5em;
 }
+/* Ensure we are overriding the existing styles without breaking other elements */
+.custom-cart-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* First row: Image and title side-by-side */
+.custom-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Space between first and second rows */
+}
+
+/* Custom image holder: Fixed small size */
+.custom-image-holder {
+    flex: 0 0 60px; /* Fixed width for image */
+    margin-right: 10px;
+}
+
+.custom-image-holder img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Title and vendor link */
+.custom-text-holder {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Second row: Price and controls on a single line */
+.custom-price-holder {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Space between second and third rows */
+}
+
+.custom-price {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+ 
+.custom-quantity {
+    margin: 0 18px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Third row: Description full width */
+.custom-description {
+    font-size: 14px;
+    color: #555;
+}
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-responsive table {
+    width: 100%;
+    min-width: 600px; /* Set a minimum width to maintain the structure */
+}
+
+.table-responsive td, .table-responsive th {
+    white-space: nowrap;
+}
+
+@media only screen and (max-width:780px) {
+    a.get-start-btn {
+        display: block;
+        margin-top: 15px!important;
+        margin-left: 0!important;
+    }
+    .main-search-bar {
+        padding-top: 60px!important;
+        padding-bottom: 40px!important;
+        background-position: left !important;
+    }
+
+    .user-dashboard {
+        width: 100% !important;
+    }
+
+}

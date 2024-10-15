@@ -4,6 +4,8 @@ from accounts import views as AccountViews
 urlpatterns = [
     path('', AccountViews.vendorDashboard, name='vendorDashboard'),
     path('profile/', views.profile, name='profile'),
+    path('my_orders/', views.my_orders, name="vendor_my_orders"),
+    path('my_orders/order_detail/<int:ord_id>/', views.order_detail, name="vendor_order_detail"),
     path('menu_manager/', views.menu_manager, name='menu_manager'),
     
     path('menu_manager/foodItem_by_category/<int:pk>', views.foodItem_by_category, name='foodItem_by_category'),

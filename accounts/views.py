@@ -1,5 +1,7 @@
+import decimal
 from django.shortcuts import render, redirect
 from django.http import *
+import simplejson
 from .forms import *
 from vendor.models import Vendor
 from vendor.forms import vendorForm
@@ -9,7 +11,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from .utils import check_role_customer, check_role_vendor, send_verification_email
-from orders.models import Order
+import datetime
+from orders.models import Order, OrderedFood
 # Create your views here.
 
 
@@ -146,14 +149,54 @@ def myAccount(request):
 @login_required(login_url='login')    
 @user_passes_test(check_role_vendor)
 def vendorDashboard(request):
-    return render(request, 'accounts/vendorDashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(
+        is_ordered=True,
+        orderedfood__fooditem__vendor=vendor
+    ).distinct().order_by('-created_at')
+    
+    vendor_orders = []
+    
+    for order in orders[:5]:
+        vendor_data = simplejson.loads(order.vendor_data).get(str(vendor.id), None)
+        if vendor_data:
+            order_info = {
+                'order_number': order.order_number,
+                'date': order.created_at,
+                'total': vendor_data['total'],
+                'status': order.status
+            }
+            vendor_orders.append(order_info)
+    
+    revenue = decimal.Decimal(0)
+    for order in orders:
+        vendor_data = simplejson.loads(order.vendor_data).get(str(vendor.id), None)
+        if vendor_data:
+            revenue += decimal.Decimal(vendor_data['total']).quantize(decimal.Decimal('0.00'))
+    
+    this_month_revenue = 0
+    current_month = datetime.datetime.now().month
+    this_month_orders = orders.filter(created_at__month=current_month)
+    for order in this_month_orders:
+        vendor_data = simplejson.loads(order.vendor_data).get(str(vendor.id), None)
+        if vendor_data:
+            this_month_revenue += decimal.Decimal(vendor_data['total']).quantize(decimal.Decimal('0.00'))
+
+
+    context = {
+        'vendor_orders': vendor_orders,
+        'total_orders': orders.count(),
+        'revenue':revenue,
+        'this_month_revenue':this_month_revenue
+    }
+    return render(request, 'accounts/vendorDashboard.html', context)
 
 @login_required(login_url='login') 
 @user_passes_test(check_role_customer)   
 def custDashboard(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('created_at')[:6]
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('created_at')
     context = {
-        'orders':orders,
+        'orders':orders[:6],
         'total_orders':orders.count(),
     }
     return render(request, 'accounts/custDashboard.html', context)

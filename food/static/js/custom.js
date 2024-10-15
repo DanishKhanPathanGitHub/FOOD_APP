@@ -1,43 +1,61 @@
-let autocomplete;
+let autocompleteAddress, autocompleteLocation;
  
 function initAutoComplete() {
-    autocomplete = new google.maps.places.Autocomplete(
+    // Initialize autocomplete for the address field
+    autocompleteAddress = new google.maps.places.Autocomplete(
         document.getElementById('id_address'),
         {
             types: ['geocode', 'establishment'],
-            // Set the default country code, e.g., 'lt' for Lithuania
+            componentRestrictions: { 'country': ['in'] }, // Limit to a specific country
+        }
+    );
+
+    // Add listener for address input
+    autocompleteAddress.addListener('place_changed', onPlaceChangedAddress);
+
+    // Initialize autocomplete for the location field
+    autocompleteLocation = new google.maps.places.Autocomplete(
+        document.getElementById('id_location'),
+        {
+            types: ['geocode', 'establishment'],
             componentRestrictions: { 'country': ['in'] },
         }
     );
- 
-    // Specify the function to be called when a prediction is clicked
-    autocomplete.addListener('place_changed', onPlaceChanged);
+
+    // Add listener for location input
+    autocompleteLocation.addListener('place_changed', onPlaceChangedLocation);
 }
+
+function onPlaceChangedLocation() {
+    var place = autocompleteLocation.getPlace();
  
-document.addEventListener('DOMContentLoaded', function () {
-    // Toggle the dropdown menu when the trigger is clicked
-    const dropdownTrigger = document.querySelector('.dropdown > a');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
+    // Reset the input field or show an alert if the user did not select a prediction
+    if (!place.geometry) {
+        document.getElementById('id_location').placeholder = "Start typing...";
+    } else {
+        //console.log('place name =>', place.name);
+    }
+    // Get the address components and assign them to the fields
+    var geocoder = new google.maps.Geocoder();
+    var location = document.getElementById('id_location').value;
+    
+    geocoder.geocode({ 'location': location }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            var latitude = results[0].geometry.location.lat();
+            var longitude = results[0].geometry.location.lng();
+            $('#id_latitude1').val(latitude);
 
-    dropdownTrigger.addEventListener('click', function (event) {
-        event.preventDefault(); // Prevent default link behavior
-        event.stopPropagation(); // Prevent event bubbling
-        dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
-    });
-
-    // Close the dropdown menu when clicking outside of it
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.dropdown')) {
-            dropdownMenu.style.display = 'none';
+            $('#id_longitude1').val(longitude);
+            
+            $('#id_location').val(longitude);
         }
     });
-});
+}
 
 
 
-
-function onPlaceChanged() {
-    var place = autocomplete.getPlace();
+function onPlaceChangedAddress() {
+    var place = autocompleteAddress.getPlace();
  
     // Reset the input field or show an alert if the user did not select a prediction
     if (!place.geometry) {
@@ -48,7 +66,6 @@ function onPlaceChanged() {
     // Get the address components and assign them to the fields
     var geocoder = new google.maps.Geocoder(); 
     var address = document.getElementById('id_address').value;
- 
     geocoder.geocode({ 'address': address }, function (results, status) {
         if (status == google.maps.GeocoderStatus.OK) {
             var latitude = results[0].geometry.location.lat();
@@ -80,8 +97,28 @@ function onPlaceChanged() {
             }
         }
     });
+
 }
- 
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle the dropdown menu when the trigger is clicked
+    const dropdownTrigger = document.querySelector('.dropdown > a');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    dropdownTrigger.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent default link behavior
+        event.stopPropagation(); // Prevent event bubbling
+        dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // Close the dropdown menu when clicking outside of it
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.dropdown')) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+});
  
 $(document).ready(function(){
     //add to cart
@@ -177,16 +214,7 @@ $(document).ready(function(){
                 }else {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
                     swal(response.status, response.message, "success")
-                    removeCartItem(0, cart_id)
-                    chehckEmptyCart();
-
-                    //subtotal, tax, total
-                    getCartAmoounts(
-                        response.get_cart_total['subtotal'],
-                        response.get_cart_total['taxtotal'],
-                        response.get_cart_total['total'],
-                        response.get_cart_total['taxes'],
-                    )
+                    window.location.href = '/cart/';
                 }
             }
         })

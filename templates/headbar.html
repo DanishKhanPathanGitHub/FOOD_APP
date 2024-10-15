@@ -16,13 +16,13 @@
                             <li class="location-has-children choose-location">
                                 <form action="#">
                                     {% if location %}
-                                    <input type="text" value="{{ location }}" id="location" name="location" placeholder="Your current location" autocomplete="off">
-                                    <input type="hidden" value="{{ lat }}" id="lat" name="lat">
-                                    <input type="hidden" value="{{ long }}" id="long" name="long">
+                                    <input type="text" value="{{ location }}" id="id_location" name="location" placeholder="Your current location" autocomplete="off">
+                                    <input type="hidden" value="{{ lat }}" id="id_latitude1" name="lat">
+                                    <input type="hidden" value="{{ long }}" id="id_longitude1" name="long">
                                     {% else %}
-                                    <input type="text" value="" id="location" name="location" placeholder="Your location" autocomplete="off">
-                                    <input type="hidden" value="" id="lat" name="lat">
-                                    <input type="hidden" value="" id="long" name="long">
+                                    <input type="text" value="" id="id_location" name="location" placeholder="Your location" autocomplete="off">
+                                    <input type="hidden" value="" id="id_latitude1" name="lat">
+                                    <input type="hidden" value="" id="id_longitude1" name="long">
                                     {% endif %}
                                     {% if user.is_authenticated %}
                                     <span id="foodbakery_radius_location_open" onclick="getLocation()" class="foodbakery-radius-location"><i class="icon-target5"></i></span>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="login-option">
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and user.role == 1%}
                         <a href="{% url "cart" %}">
                             <i class="fa fa-shopping-cart text-danger" style="font-size:25px;"></i>
                             <span class="badge badge-warning" id="cart_counter" style="border-radius:50px; position:relative; bottom:10px; left:-5px;">{{cart_count}}</span>
@@ -69,9 +69,9 @@
 </header>
 
 <script>
-    var x = document.getElementById("location");
-    var latField = document.getElementById("lat");
-    var longField = document.getElementById("long");
+    var x = document.getElementById("id_location");
+    var latField = document.getElementById("id_latitude1");
+    var longField = document.getElementById("id_longitude1");
 
     function getLocation() {
         if (navigator.geolocation) {
@@ -104,7 +104,7 @@
                         'long': long,
                     },
                     success: function(response) {
-                        console.log("Location data stored in session successfully.");
+                        window.location.href='/';
                     },
                     error: function(xhr, status, error) {
                         console.error("Error storing location data in session:", error);

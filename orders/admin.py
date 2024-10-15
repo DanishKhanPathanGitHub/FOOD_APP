@@ -4,13 +4,12 @@ from .models import *
 
 class orderFoodInline(admin.TabularInline):
     model = OrderedFood
-    readonly_fields = ('order', 'payment', 'user', 'fooditem', 'quantity', 'price', 'amount')
+    readonly_fields = ('order', 'user', 'fooditem', 'quantity', 'price', 'amount')
     extra = 0
 
 class orderAdmin(admin.ModelAdmin):
     list_display = [
-        'order_number', 'name', 'phone_no', 'email', 'total',
-        'payment_method', 'status', 'is_ordered'
+        'order_number', 'name', 'email', 'total', 'status', 'is_ordered'
     ]
     inlines = [orderFoodInline]
 

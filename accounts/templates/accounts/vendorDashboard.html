@@ -21,68 +21,56 @@
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
                             <h5 class="text-uppercase">Overview</h5>
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="container pb-3">
                                 <div class="row">
-                                    <div class="element-title has-border right-filters-row">
-                                        <div class="right-filters row pull-right">
-                                            <div class="col-lg-6 col-md-6 col-xs-6">
-                                                <div class="input-field">
-                                                    <select class="chosen-select-no-single">
-                                                        <option selected="selected" value="">Select Orders Status</option>
-                                                        <option value="Processing">Processing</option>
-                                                        <option value="Cancelled">Cancelled</option>
-                                                        <option value="Completed">Completed</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+                                    <!-- Logged In As Box -->
+                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                        <div class="box bg-light p-4 text-center shadow-sm rounded">
+                                            <h6>Total orders</h6>
+                                            <p class="font-weight-bold text-truncate">{{ total_orders }}</p> <!-- Ensure text stays within the box -->
+                                            <a href="{% url "vendor_my_orders" %}" class="btn btn-success px-2 py-0"><i class="fa fa-long-arrow-right"></i></a>
+                                        </div>
+                                    </div>
+                                    <!-- Total Orders Box -->
+                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                        <div class="box bg-light p-4 text-center shadow-sm rounded">
+                                            <h6>Total revenue</h6><br>
+                                            <p class="font-weight-bold">{{revenue}}</p> <!-- Replace with actual order count -->
                                             
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                        <div class="box bg-light p-4 text-center shadow-sm rounded">
+                                            <h6>This month revenue</h6>
+                                            <p class="font-weight-bold">{{this_month_revenue}}</p> <!-- Replace with actual order count -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <h5>Recent orders</h5>
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="user-orders-list">
                                         <div class="responsive-table">
                                             <ul class="table-generic">
                                                 <li class="order-heading-titles">
-                                                    <div>Order id</div>
+                                                    <div>Order ID</div>
                                                     <div>Date</div>
-                                                    <div>Total Price</div>
-                                                    <div>Charges</div>
-                                                    <div>Received</div>
+                                                    <div>Total</div>
                                                     <div>Status</div>
+                                                    <div>Details</div>
                                                 </li>
+                                                {% for order in vendor_orders %}
                                                 <li class="order-heading-titles">
-                                                    <div><a href="#" data-toggle="modal" data-target="#order-det-22606">order-22606</a></div>
-                                                    <div>Apr 9,2020</div>
-                                                    <div>£ 38.99</div>
-                                                    <div>£ 3.90</div>
-                                                    <div>£ 35.09</div>
-                                                    <div><span class="order-status" style="background-color: #047a06;">Completed</span></div>
+                                                    <div>{{ order.order_number }}</div>
+                                                    <div>{{ order.date|date }}</div>
+                                                    <div>Rs. {{ order.total }}</div>
+                                                    <div><span class="order-status" style="background-color: #047a06;">{{order.status}}</span></div>
+                                                    <div><a class="btn btn-danger" href="{% url "vendor_order_detail" order.order_number %}">view</a></div>
                                                 </li>
-                                                
-                                                
-                                                
-                                                <li class="order-heading-titles">
-                                                    <div><a href="#" data-toggle="modal" data-target="#order-det-22606">order-22583</a></div>
-                                                    <div>Apr 9,2020</div>
-                                                    <div>£ 26.22</div>
-                                                    <div>£ 2.62</div>
-                                                    <div>£ 23.60</div>
-                                                    <div><span class="order-status" style="background-color: #1e73be;">Processing</span></div>
-                                                </li>
-                                                <li class="order-heading-titles">
-                                                    <div><a href="#" data-toggle="modal" data-target="#order-det-22606">order-22493</a></div>
-                                                    <div>Apr 2,2020</div>
-                                                    <div>£ 28.24</div>
-                                                    <div>£ 2.82</div>
-                                                    <div>£ 25.42</div>
-                                                    <div><span class="order-status" style="background-color: #047a06;">Completed</span></div>
-                                                </li>
+                                                {% endfor %}
                                             </ul>
-
-                                        </div>												
+                                        </div>										
                                     </div>
                                 </div>
                             </div>

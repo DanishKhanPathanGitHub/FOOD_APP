@@ -43,12 +43,15 @@
                                 {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-3">
+                                        <label>Day</label>
                                         {{form.day}}
                                     </div>
                                     <div class="col-md-4">
+                                        <label>From hour</label>
                                         {{form.from_hour}}
                                     </div>
                                     <div class="col-md-4">
+                                        <label>To hour</label>
                                         {{form.to_hour}}
                                     </div>
                                     <div class="col-md-1">

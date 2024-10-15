@@ -23,8 +23,8 @@
                                             <div>{{order.address}}</div>
                                             <div>{{ order.city }}, {{ order.pincode }}</div>
                                             <div>{{ order.state }}, {{order.country}}</div>
-                                            <div><b>Phone no:</b> {{ order.phone_no }}, <b>Email:</b> {{order.email}}</div>
-                                            <div><b>Payment:</b> {{order.payment_method}}</div>
+                                            <b>Email:</b> {{order.email}}</div>
+                                            <div><b>Payment:</b> {{payment_method}}</div>
                                             <br>
                                             <div><a href="{% url 'checkout' %}" class="btn btn-outilne-danger">Edit</a></div>
                                             <br>
@@ -77,7 +77,7 @@
                                                     <span class="subtotal">{{subtotal}}</span>
                                                 </span>
                                             </li>
-                                            {% for taxtype, value in taxe_data.items %}
+                                            {% for taxtype, value in taxes.items %}
                                             <li style="list-style-type: none;">
                                                 {{taxtype}} - {{value.0}}%
                                                 <span class="price float-right">
@@ -98,7 +98,7 @@
                                                 </span>
                                             </li>
 
-                                            {% if order.payment_method == 'RazorPay' %}
+                                            {% if payment_method == 'RazorPay' %}
                                             <div id="rzp_payment_button">
                                                 <button class="btn btn-danger w-100 p-2" id="rzp-button1">Pay with RazorPay</button>
                                                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -106,8 +106,6 @@
                                             {% endif %}
                                         </ul>
                                         
-                                        <!-- end thee form -->
-                                    </form>
                                     </div>
 
                                 </div>
@@ -138,15 +136,11 @@
         return cookieValue;
     }
     
-    var total = "{{total}}"
-    var url = "{% url 'payments' %}"
-    var order_number = {{order.order_number}}
     const csrftoken = getCookie('csrftoken');
-    var order_complete = "{% url 'order_complete' %}"
 
     var options = {
         "key": "{{RZP_KEY_ID}}", // Enter the Key ID generated from the Dashboard
-        "amount": "5000", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "amount": "{{rzp_amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         "currency": "INR",
         "name": "Food online", //your business name
         "description": "Test Transaction",
@@ -156,9 +150,7 @@
             //alert('payment_id'+response.razorpay_payment_id);
             //alert('order_id'+response.razorpay_order_id);
             //alert('signature'+response.razorpay_signature)
-            const element = document.getElementById('rzp_payment_button');
-            element.innerHTML = '';
-            element.innerHTML = '<h4 class="text-center"><i class="fa fa-spinner fa-spin"></i>Please wait...</h4>';
+            document.getElementById('rzp_payment_button').innerHTML = '<h4 class="text-center"><i class="fa fa-spinner fa-spin"></i> Please wait...</h4>';
 
             var transaction_id = response.razorpay_payment_id
             var payment_method = 'RazorPay'
@@ -168,7 +160,6 @@
         "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
             "name": "{{order.name}}", //your customer's name
             "email": "{{order.email}}", 
-            "contact": "{{order.phone_no}}"  //Provide the customer's phone number for better conversion rates 
         },
         "notes": {
             "address": "Razorpay Corporate Office"
@@ -196,18 +187,30 @@
     function sendTransactions(transaction_id, payment_method, status){
         $.ajax({
             type:'POST',
-            url:url,
+            url:"{% url 'payments' %}",
             data: {
-                'order_number':order_number,
+                'order_number': "{{ order.order_number }}",
                 'transaction_id':transaction_id,
                 'payment_method':payment_method,
                 'status':status,
                 'csrfmiddlewaretoken':csrftoken,
             },
             success: function(response){
-                window.location.href = '/my_orders/order_detail/' + order_number;
+                window.location.href = '/customer/my_orders/' + response.order_number;
+            },
+            error: function(error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong with your order. Please try again!',
+                    confirmButtonText: 'Go to Cart'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/cart/';  // Redirect to cart page
+                    }
+                });
             }
-        })
+        });
     }
 </script>
 <!-- Main Section End -->

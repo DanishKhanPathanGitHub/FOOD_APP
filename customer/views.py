@@ -43,16 +43,12 @@ def my_orders(request):
 @user_passes_test(check_role_customer)
 def order_detail(request, ord_id):
     try:
-        print('inside try block, order id: ', ord_id)
         order = Order.objects.get(order_number=ord_id)
-        print('order get determined')
         ordered_food = OrderedFood.objects.filter(order=order)
-        print('food get determined')
         tax_data = simplejson.loads(order.tax_data)
         subtotal = 0
         for item in ordered_food:
             subtotal+= item.fooditem.price * item.quantity 
-        print('ready for the context')
         context = {
             'order':order,
             'ordered_food':ordered_food,
